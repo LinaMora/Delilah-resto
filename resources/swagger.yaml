@@ -1,0 +1,408 @@
+swagger: '2.0'
+
+info:
+  version: "1.0.0"
+  title: "Delilah Restó"
+  description: "This is a server for handling orders to a restaurant. It has a login and billing system, its use is completely free and it has the ability to add new features if necessary."
+  contact:
+    name: "API Support"
+    url: "https://github.com/poved4/Resto"
+
+host: "localhost:3000"
+basePath: "/resto.com"
+
+tags:
+- name: "usuarios"
+  description: "Operations about users"
+- name: "productos"
+  description: "Operations about Products"
+- name: "pedidos"
+  description: "Operations about orders"
+
+schemes:
+- "http"
+
+paths:
+  /singIn:
+    post:
+      tags:
+      - "usuarios"
+      summary: "Create user"
+      description: ""
+      operationId: "createUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: '#/definitions/user'
+      responses:
+        "201":
+          description: "Created"
+        "400":
+          description: "Invalid data supplied"
+  /singUp:
+    post:
+      tags:
+      - "usuarios"
+      summary: "Logs user into the system"
+      description: ""
+      operationId: "loginUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "user data for log"
+        required: true
+        schema:
+          type: "object"
+          properties:
+              email:
+                type: "string"
+              password:
+                type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/user"
+        '400':
+          description: "Invalid username/password supplied"
+  /usuarios:
+    get:
+      tags:
+      - "usuarios"
+      summary: "Get user info"
+      description: ""
+      operationId: "GetUserInfo"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/user"
+  
+  /productos:
+    get:
+      tags:
+      - "productos"
+      summary: "Returns products inventories"
+      description: ""
+      operationId: "getInventory"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            additionalProperties:
+              $ref: "#/definitions/products"
+        "404":
+          description: "Not Found"
+        "401":
+          description: "Unauthorized"
+    post:
+      tags:
+      - "productos"
+      summary: "Add a new products to the inventories"
+      description: "This can only be done by manager user."
+      operationId: "addProduct"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Product object to added to the inventory"
+        required: true
+        schema:
+          $ref: "#/definitions/newProducts"
+      responses:
+        "201":
+          description: "created"
+        "400":
+          description: "Invalid data supplied"
+        "401":
+          description: "Unauthorized"
+      
+  /productos/{productId}:
+    get:
+      tags:
+      - "productos"
+      summary: "Find product by ID"
+      description: "This can only be done by the logged in user."
+      operationId: "getProductById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "productId"
+        in: "path"
+        description: "The object id that need to be consulted"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/products"
+        "404":
+          description: "Not Found"
+    patch:
+      tags:
+      - "productos"
+      summary: "Updated product"
+      description: "This can only be done by manager user."
+      operationId: "updateProduct"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "productId"
+        in: "path"
+        description: "product id to updated"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        description: "data to update" 
+        required: true
+        schema:
+          type: "object"
+          properties:
+              price:
+                type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid data supplied"
+        "401":
+          description: "Unauthorized"
+    delete:
+      tags:
+      - "productos"
+      summary: "Delete Product"
+      description: "This can only be done by manager user."
+      operationId: "deleteProduct"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "productId"
+        in: "path"
+        description: "product id to deleted"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "204":
+          description: "No Content"
+        "400":
+          description: "Invalid data supplied"
+        "401":
+          description: "Unauthorized"
+  
+  /pedidos:
+    get:
+      tags:
+      - "pedidos"
+      summary: "Returns orders on inventories"
+      description: "This can only be done by manager user."
+      operationId: "GetAllOrders"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/orderCreated"
+        "404":
+          description: "Not Found"
+        "401":
+          description: "Unauthorized"
+    post:
+      tags:
+      - "pedidos"
+      summary: "create a new order"
+      description: "This can't be done by the logged in user."
+      operationId: "OrderUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "order object"
+        required: true
+        schema:
+          $ref: '#/definitions/order'
+      responses:
+        '200':
+          description: "successful operation"
+        '400':
+         description: "Invalid data supplied"
+    patch:
+      tags:
+      - "pedidos"
+      summary: "Update order state "
+      description: "This can only be done by manager user."
+      operationId: "updateOrderState"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "data to update" 
+        required: true
+        schema:
+            type: "object"
+            properties:
+              id: 
+                type: "integer"
+              state:
+                type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid data supplied"
+        "401":
+          description: "Unauthorized"
+          
+  /pedidos/{idPedido}:
+    delete:
+      tags:
+      - "pedidos"
+      summary: "Delete Order"
+      description: "This can only be done by manager user."
+      operationId: "deleteOrder"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "idPedido"
+        in: "path"
+        description: "Order id to deleted"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "204":
+          description: "No Content"
+        "400":
+          description: "Invalid data supplied"
+        "401":
+          description: "Unauthorized"
+          
+  /mis-pedidos:
+    get:
+      tags:
+      - "pedidos"
+      summary: "Returns user orders on inventories"
+      description: "This can only be done by the logged in user."
+      operationId: "GetUserOrders"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/orderCreated"
+        "404":
+          description: "Not Found"
+          
+
+definitions:
+  user:
+    type: "object"
+    properties:
+      user:
+        type: "string"
+      fullName:
+        type: "string"
+      email:
+        type: "string"
+      phone:
+        type: "integer"
+      adress:
+        type: "string"
+      password:
+        type: "string"
+    xml:
+      name: "User"
+  products:
+    type: "object"
+    properties:
+      products_id: 
+        type: "integer"
+      products_Price:
+        type: "integer"
+      products_Name: 
+        type: "string"
+      products_link_img: 
+        type: "string"
+  newProducts:
+    type: "object"
+    properties:
+      price: 
+        type: "integer"
+      name: 
+        type: "string"
+      link_img: 
+        type: "string"  
+    xml:
+      name: "User"
+  order:
+    type: "object"
+    properties:
+      wayToPay: 
+        type: "string"
+      products:
+        type: "object"
+        properties:
+          id: 
+            type: "integer"
+          quantity:
+            type: "integer"
+  orderCreated:
+    type: "object"
+    properties:
+      order_id: 
+        type: "integer"
+      fk_user_id: 
+        type: "integer"
+      order_state: 
+        type: "string"
+      order_date: 
+        type: "string"
+      order_price: 
+        type: "string"
+      order_way_to_pay: 
+        type: "string"
+      order_description:
+        type: "string"
+      products:
+        type: "object"
+        $ref: "#/definitions/products"
+         
