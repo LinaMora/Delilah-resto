@@ -1,5 +1,5 @@
 ﻿Hola.  
-Con esta Api podrás administrar los pedidos de un restaurante.
+La idea de esta Api es lograr administrar los pedidos de un restaurante.
 
 
 Si vas a descargar el proyecto desde git estos son los comandos que debes ingresar en la consola: 
